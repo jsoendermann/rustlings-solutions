@@ -11,8 +11,6 @@ struct Color {
     blue: u8,
 }
 
-// I AM NOT DONE
-
 // Your task is to complete this implementation
 // and return an Ok result of inner type Color.
 // You need to create an implementation for a tuple of three integers,
@@ -25,19 +23,44 @@ struct Color {
 // Tuple implementation
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = String;
-    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {}
+    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let (red_i16, green_i16, blue_i16) = tuple;
+
+        if let (Ok(red), Ok(green), Ok(blue)) = (
+            u8::try_from(red_i16),
+            u8::try_from(green_i16),
+            u8::try_from(blue_i16),
+        ) {
+            Ok(Color { red, green, blue })
+        } else {
+            Err(String::from("Casting err"))
+        }
+    }
 }
 
 // Array implementation
 impl TryFrom<[i16; 3]> for Color {
     type Error = String;
-    fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {}
+    fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        let [red, green, blue] = arr;
+        Color::try_from((red, green, blue))
+    }
 }
 
 // Slice implementation
 impl TryFrom<&[i16]> for Color {
     type Error = String;
-    fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {}
+    fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            return Err(String::from("Wrong length"));
+        }
+        let mut i = slice.iter();
+        if let [Some(r), Some(g), Some(b)] = [i.next(), i.next(), i.next()] {
+            Color::try_from((*r, *g, *b))
+        } else {
+            Err(String::from("Invalid args"))
+        }
+    }
 }
 
 fn main() {
